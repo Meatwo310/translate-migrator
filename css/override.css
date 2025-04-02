@@ -22,19 +22,4 @@ body {
   grid-column: 1 / -1; /* グリッド全体を使用 */
 }
 
-/* 縦長ではない画面（横幅が高さより大きい場合）は2x2グリッド */
-@media (orientation: landscape) {
-  .container-wrapper {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-  }
-}
-
-/* 縦長画面（高さが横幅より大きい場合）は縦に4つ並ぶ */
-@media (orientation: portrait) {
-  .container-wrapper {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 1fr);
-  }
-}
 

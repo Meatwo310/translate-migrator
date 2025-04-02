@@ -24,24 +24,46 @@ import * as monaco from 'monaco-editor';
 }
 */
 
-const diffEditors = [
-  "diff-container-1",
-  "diff-container-2"
-].map(containerId => {
+/**
+ * @param id {string}
+ * @param readOnly {boolean}
+ * @returns {monaco.editor.IStandaloneDiffEditor}
+ */
+const newDiffEditor = (id, readOnly) => {
   return monaco.editor.createDiffEditor(
-    document.getElementById(containerId),
+    document.getElementById(id),
     {
       enableSplitViewResizing: true,
       renderSideBySide: true,
       automaticLayout: true,
       originalEditable: true,
+      readOnly: readOnly,
     }
   );
-});
+}
+
+const diffEditors = [
+  newDiffEditor("diff-container-1", false),
+  newDiffEditor("diff-container-2", true),
+];
 
 diffEditors.forEach((diff) => {
   diff.setModel({
     original: monaco.editor.createModel('', 'json'),
-    modified: monaco.editor.createModel('', 'json')
+    modified: monaco.editor.createModel('', 'json'),
   });
-})
+});
+
+diffEditors[0].getOriginalEditor().updateOptions({
+  placeholder: '旧バージョンの en_us.json を貼り付けてください',
+});
+diffEditors[0].getModifiedEditor().updateOptions({
+  placeholder: '新バージョンの en_us.json を貼り付けてください',
+});
+diffEditors[1].getOriginalEditor().updateOptions({
+  placeholder: '旧バージョンの ja_jp.json を貼り付けてください',
+});
+diffEditors[1].getModifiedEditor().updateOptions({
+  placeholder: '新バージョンへアップデートされた ja_jp.json が表示されます',
+});
+
