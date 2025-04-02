@@ -1,5 +1,6 @@
 // noinspection NpmUsedModulesInstalled
 import * as monaco from 'monaco-editor';
+import PowerDiff from "./powerdiff";
 
 /*
 {
@@ -24,6 +25,25 @@ import * as monaco from 'monaco-editor';
 }
 */
 
+const getEditorValue = (editor) => {
+  const text = editor.getValue().trim();
+  return text ? text : '{}';
+};
+
+const parseJsonSafely = (text) => {
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error('JSONパースエラー:', e);
+    return {};
+  }
+};
+
+const formatJson = (obj) => {
+  return JSON.stringify(obj, null, 2);
+};
+
+
 /**
  * @param id {string}
  * @param readOnly {boolean}
@@ -40,7 +60,7 @@ const newDiffEditor = (id, readOnly) => {
       readOnly: readOnly,
     }
   );
-}
+};
 
 const diffEditors = [
   newDiffEditor("diff-container-1", false),
@@ -67,3 +87,61 @@ diffEditors[1].getModifiedEditor().updateOptions({
   placeholder: '新バージョンへアップデートされた ja_jp.json が表示されます',
 });
 
+const autoUpdateTranslation = () => {
+  try {
+    // 各エディタからテキストを取得
+    const oldEnText = getEditorValue(diffEditors[0].getOriginalEditor());
+    const newEnText = getEditorValue(diffEditors[0].getModifiedEditor());
+    const oldJaText = getEditorValue(diffEditors[1].getOriginalEditor());
+
+    // すべてのテキストが入力されているか確認
+    if (!oldEnText || !newEnText || !oldJaText) {
+      return; // いずれかが空の場合は更新しない
+    }
+
+    // JSONオブジェクトへパース
+    const oldEn = parseJsonSafely(oldEnText);
+    const newEn = parseJsonSafely(newEnText);
+    const oldJa = parseJsonSafely(oldJaText);
+
+    // PowerDiffを使用して差分を検出し、パッチを適用
+    const diffProcessor = new PowerDiff(oldEn, newEn);
+    const newJa = diffProcessor.applyPatch(oldJa);
+
+    // 更新された日本語翻訳をエディタに設定
+    // const formattedJson = formatJson(newJa);
+    // diffEditors[1].getModifiedEditor().setValue(formattedJson === '{}' ? '' : formattedJson);
+    diffEditors[1].getModifiedEditor().setValue(newJa.length === 0 ? '' : formatJson(newJa));
+
+    console.log('翻訳が自動更新されました');
+  } catch (e) {
+    console.error('翻訳の自動更新中にエラーが発生しました:', e);
+    // 自動更新ではアラートは表示しない
+  }
+};
+
+// 各エディタの変更を監視
+const setupChangeListeners = () => {
+  // debounce関数でエディタの連続変更を制御
+  let debounceTimer;
+  const debounce = (func, delay) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(func, delay);
+  };
+
+  // 各エディタに変更イベントリスナーを追加
+  diffEditors[0].getOriginalEditor().onDidChangeModelContent(() => {
+    debounce(autoUpdateTranslation, 500);
+  });
+
+  diffEditors[0].getModifiedEditor().onDidChangeModelContent(() => {
+    debounce(autoUpdateTranslation, 500);
+  });
+
+  diffEditors[1].getOriginalEditor().onDidChangeModelContent(() => {
+    debounce(autoUpdateTranslation, 500);
+  });
+};
+
+// 変更リスナーのセットアップを実行
+setupChangeListeners();
