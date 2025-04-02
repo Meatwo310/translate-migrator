@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+  padding: 0;
+  /*background-color: #f5f5f5; !* 背景色を少し変えて視認性を向上 *!*/
+}
+
+.container-wrapper {
+  display: grid;
+  gap: 20px; /* 間隔を増やす */
+  width: 100%;
+  height: 100vh;
+  padding: 20px; /* 外側の余白を追加 */
+  box-sizing: border-box;
+}
+
+.editor-container {
+  min-height: 200px;
+  border: 1px solid #ccc;
+  padding: 15px; /* コンテナ内の余白を追加 */
+  overflow: auto; /* スクロールが必要な場合に表示 */
+  border-radius: 5px; /* 角を丸くする（オプション） */
+  grid-column: 1 / -1; /* グリッド全体を使用 */
+}
+
+/* 縦長ではない画面（横幅が高さより大きい場合）は2x2グリッド */
+@media (orientation: landscape) {
+  .container-wrapper {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+}
+
+/* 縦長画面（高さが横幅より大きい場合）は縦に4つ並ぶ */
+@media (orientation: portrait) {
+  .container-wrapper {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 1fr);
+  }
+}
+
