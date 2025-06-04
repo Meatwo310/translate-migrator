@@ -145,3 +145,5 @@ const setupChangeListeners = () => {
 
 // 変更リスナーのセットアップを実行
 setupChangeListeners();
+
+document.getElementById('status-bar').innerText = '';
