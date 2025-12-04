@@ -7,17 +7,7 @@ body {
 .controls {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 20px;
-}
-
-.controls label {
-  font-weight: 600;
-}
-
-.controls select {
-  padding: 6px 10px;
-  font-size: 14px;
+  padding: 2px 20px;
 }
 
 .container-wrapper {
