@@ -70,6 +70,7 @@ const getEditorValue = (editor) => {
 const App = () => {
   const [format, setFormat] = useState('json');
   const [status, setStatus] = useState('Monaco Editorを読み込み中...');
+  const formatRef = useRef(format);
   const diffEditorsRef = useRef([]);
   const debounceTimerRef = useRef();
 
@@ -77,28 +78,30 @@ const App = () => {
     () => [{ id: 'diff-container-1' }, { id: 'diff-container-2' }],
     []
   );
-  const containerRefs = useRef(
-    Array.from({ length: editorContainers.length }, () => React.createRef())
-  );
+  const containerRefs = useRef([]);
+  if (!containerRefs.current.length) {
+    containerRefs.current = editorContainers.map(() => React.createRef());
+  }
 
-  const updatePlaceholders = useCallback(
-    (selectedFormat) => {
-      const placeholders = placeholderTexts[selectedFormat] ?? placeholderTexts.json;
-      diffEditorsRef.current[0]?.getOriginalEditor().updateOptions({
-        placeholder: placeholders.oldEn,
-      });
-      diffEditorsRef.current[0]?.getModifiedEditor().updateOptions({
-        placeholder: placeholders.newEn,
-      });
-      diffEditorsRef.current[1]?.getOriginalEditor().updateOptions({
-        placeholder: placeholders.oldJa,
-      });
-      diffEditorsRef.current[1]?.getModifiedEditor().updateOptions({
-        placeholder: placeholders.newJa,
-      });
-    },
-    []
-  );
+  useEffect(() => {
+    formatRef.current = format;
+  }, [format]);
+
+  const updatePlaceholders = useCallback((selectedFormat) => {
+    const placeholders = placeholderTexts[selectedFormat] ?? placeholderTexts.json;
+    diffEditorsRef.current[0]?.getOriginalEditor().updateOptions({
+      placeholder: placeholders.oldEn,
+    });
+    diffEditorsRef.current[0]?.getModifiedEditor().updateOptions({
+      placeholder: placeholders.newEn,
+    });
+    diffEditorsRef.current[1]?.getOriginalEditor().updateOptions({
+      placeholder: placeholders.oldJa,
+    });
+    diffEditorsRef.current[1]?.getModifiedEditor().updateOptions({
+      placeholder: placeholders.newJa,
+    });
+  }, []);
 
   const setEditorsLanguage = useCallback((selectedFormat) => {
     const language = selectedFormat === 'json' ? 'json' : 'plaintext';
@@ -111,8 +114,9 @@ const App = () => {
   }, []);
 
   const autoUpdateTranslation = useCallback(() => {
-    const parser = parsers[format] ?? parsers.json;
-    const formatter = formatters[format] ?? formatters.json;
+    const currentFormat = formatRef.current;
+    const parser = parsers[currentFormat] ?? parsers.json;
+    const formatter = formatters[currentFormat] ?? formatters.json;
 
     try {
       const [enDiff, jaDiff] = diffEditorsRef.current;
@@ -138,7 +142,7 @@ const App = () => {
     } catch (e) {
       console.error('翻訳の自動更新中にエラーが発生しました:', e);
     }
-  }, [format]);
+  }, []);
 
   const setupChangeListeners = useCallback(() => {
     diffEditorsRef.current[0]
@@ -182,8 +186,8 @@ const App = () => {
     });
 
     diffEditorsRef.current = editors;
-    setEditorsLanguage(format);
-    updatePlaceholders(format);
+    setEditorsLanguage(formatRef.current);
+    updatePlaceholders(formatRef.current);
     setupChangeListeners();
     setStatus('');
 
@@ -195,7 +199,7 @@ const App = () => {
         diff.dispose();
       });
     };
-  }, [format, setEditorsLanguage, setupChangeListeners, updatePlaceholders]);
+  }, [setEditorsLanguage, setupChangeListeners, updatePlaceholders]);
 
   useEffect(() => {
     if (diffEditorsRef.current.length) {
