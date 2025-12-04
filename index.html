@@ -5,8 +5,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title></title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/override.css">
   <meta name="description" content="">
 
   <meta property="og:title" content="">
@@ -24,22 +22,8 @@
 </head>
 
 <body>
-
-  <div id="status-bar" class="status-bar">Monaco Editorを読み込み中...</div>
-
-  <div class="controls">
-    <label for="file-format">ファイル形式</label>
-    <select id="file-format">
-      <option value="json" selected>JSON (.json)</option>
-      <option value="lang">key=value (.lang)</option>
-    </select>
-  </div>
-
-  <div class="container-wrapper">
-    <div id="diff-container-1" class="editor-container"></div>
-    <div id="diff-container-2" class="editor-container"></div>
-  </div>
-
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 
 </html>
