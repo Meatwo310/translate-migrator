@@ -7,7 +7,11 @@ body {
 .controls {
   display: flex;
   align-items: center;
-  padding: 2px 20px;
+  padding-left: 0.6em;
+}
+
+.controls select {
+  margin-left: 0.6em;
 }
 
 .container-wrapper {
