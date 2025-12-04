@@ -77,7 +77,9 @@ const App = () => {
     () => [{ id: 'diff-container-1' }, { id: 'diff-container-2' }],
     []
   );
-  const containerRefs = useRef(editorContainers.map(() => React.createRef()));
+  const containerRefs = useRef(
+    Array.from({ length: editorContainers.length }, () => React.createRef())
+  );
 
   const updatePlaceholders = useCallback(
     (selectedFormat) => {
