@@ -2,8 +2,8 @@
 
 import {useCallback, useState} from "react";
 import {editor} from "monaco-editor";
-import {CustomDiffEditor} from "@/src/components/CustomDiffEditor";
-import {useStatusManager} from "@/src/hooks/useStatusManager";
+import {CustomDiffEditor} from "@/components/CustomDiffEditor";
+import {useStatusManager} from "@/hooks/useStatusManager";
 
 export default function Home() {
   const [editorsLoaded, setEditorsLoaded] = useState(0);
