@@ -1,10 +1,9 @@
 "use client";
 
 import {useCallback, useMemo, useState} from "react";
-import {randomUUID, UUID} from "node:crypto";
 
 export type StatusMessage = {
-  uuid: UUID;
+  uuid: string;
   content: string;
   spinner?: boolean;
 };
@@ -20,7 +19,7 @@ export const useStatusManager = (isLoading: boolean) => {
 
   const pushStatusMessage = useCallback((content: string, spinner?: boolean) => {
     const message: StatusMessage = {
-      uuid: randomUUID(),
+      uuid: crypto.randomUUID(),
       content,
       spinner,
     };
