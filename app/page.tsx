@@ -65,7 +65,7 @@ export default function Home() {
       {/*<option value="json">json</option>*/}
       <option value="lang">lang</option>
     </select>
-    <span id="status" style={{ marginLeft: "0.5em", display: "inline-block" }}>{status}</span>
+    <span id="status" style={{marginLeft: "0.5em", display: "inline-block"}}>{status}</span>
     <CustomDiffEditor onMount={handleFirstEditorMount}/>
     <CustomDiffEditor onMount={handleSecondEditorMount}/>
   </>);
