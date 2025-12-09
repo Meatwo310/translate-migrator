@@ -79,8 +79,6 @@ describe("patchJson", () => {
 
   "_comment": "ブロック",
   "block.examplemod.example_block": "テストブロック",
-  "block.examplemod.example_block.tooltip": "未完成",
-  "container.examplemod.custom_gui": "カスタムGUI",
 
   "_comment": "エンティティ",
   "entity.examplemod.custom_mob": "カスタムモブ [未完成]"
@@ -94,7 +92,7 @@ describe("patchJson", () => {
   "_comment": "Blocks",
   "block.examplemod.example_block": "テストブロック",
   "block.examplemod.example_block.tooltip": "Right-click to open",
-  "container.examplemod.custom_gui": "カスタムGUI",
+  "container.examplemod.custom_gui": "Custom GUI",
 
   "_comment": "Entities",
   "entity.examplemod.custom_mob": "Custom Mob"
@@ -106,7 +104,7 @@ describe("patchJson", () => {
   "_comment": "アイテム",
   "block.examplemod.example_block": "テストブロック",
   "block.examplemod.example_block.tooltip": "Right-click to open",
-  "container.examplemod.custom_gui": "カスタムGUI",
+  "container.examplemod.custom_gui": "Custom GUI",
 
   "_comment": "アイテム",
   "entity.examplemod.custom_mob": "Custom Mob"
@@ -118,7 +116,7 @@ describe("patchJson", () => {
   "_comment": "エンティティ",
   "block.examplemod.example_block": "テストブロック",
   "block.examplemod.example_block.tooltip": "Right-click to open",
-  "container.examplemod.custom_gui": "カスタムGUI",
+  "container.examplemod.custom_gui": "Custom GUI",
 
   "_comment": "エンティティ",
   "entity.examplemod.custom_mob": "Custom Mob"
@@ -130,7 +128,7 @@ describe("patchJson", () => {
   "_comment": "ブロック",
   "block.examplemod.example_block": "テストブロック",
   "block.examplemod.example_block.tooltip": "Right-click to open",
-  "container.examplemod.custom_gui": "カスタムGUI",
+  "container.examplemod.custom_gui": "Custom GUI",
 
   "_comment": "エンティティ",
   "entity.examplemod.custom_mob": "Custom Mob"

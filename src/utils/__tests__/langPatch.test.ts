@@ -68,8 +68,6 @@ item.examplemod.example_item=テストアイテム
 # ブロック
 _comment=ブロック
 block.examplemod.example_block=テストブロック
-block.examplemod.example_block.tooltip=未完成
-container.examplemod.custom_gui=カスタムGUI
 
 # エンティティ
 _comment=エンティティ
@@ -84,7 +82,7 @@ item.examplemod.example_item=テストアイテム
 _comment=Blocks
 block.examplemod.example_block=テストブロック
 block.examplemod.example_block.tooltip=Right-click to open
-container.examplemod.custom_gui=カスタムGUI
+container.examplemod.custom_gui=Custom GUI
 
 # Entities
 _comment=Entities
@@ -97,7 +95,7 @@ item.examplemod.example_item=テストアイテム
 _comment=アイテム
 block.examplemod.example_block=テストブロック
 block.examplemod.example_block.tooltip=Right-click to open
-container.examplemod.custom_gui=カスタムGUI
+container.examplemod.custom_gui=Custom GUI
 
 # アイテム
 _comment=アイテム
@@ -110,7 +108,7 @@ item.examplemod.example_item=テストアイテム
 _comment=エンティティ
 block.examplemod.example_block=テストブロック
 block.examplemod.example_block.tooltip=Right-click to open
-container.examplemod.custom_gui=カスタムGUI
+container.examplemod.custom_gui=Custom GUI
 
 # エンティティ
 _comment=エンティティ
@@ -123,7 +121,7 @@ item.examplemod.example_item=テストアイテム
 _comment=ブロック
 block.examplemod.example_block=テストブロック
 block.examplemod.example_block.tooltip=Right-click to open
-container.examplemod.custom_gui=カスタムGUI
+container.examplemod.custom_gui=Custom GUI
 
 # エンティティ
 _comment=エンティティ
