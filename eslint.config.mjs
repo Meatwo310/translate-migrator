@@ -17,11 +17,11 @@ const eslintConfig = defineConfig([
   {
     rules: {
       "prefer-const": "error",
-    }
+    },
   },
   {
     plugins: {
-      "@stylistic": stylistic
+      "@stylistic": stylistic,
     },
     rules: {
       "semi": "error",
@@ -29,8 +29,8 @@ const eslintConfig = defineConfig([
       "no-trailing-spaces": "error",
       "quotes": ["error", "double"],
       "comma-dangle": ["error", "always-multiline"],
-    }
-  }
+    },
+  },
 ]);
 
 export default eslintConfig;
