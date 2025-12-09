@@ -18,22 +18,19 @@ export const useStatusManager = (isLoading: boolean) => {
   const [statusMessages, setStatusMessages] = useState<StatusMessage[]>([]);
 
   const pushStatusMessage = useCallback((content: string, spinner?: boolean) => {
+    const uuid = crypto.randomUUID();
     const message: StatusMessage = {
-      uuid: crypto.randomUUID(),
+      uuid,
       content,
       spinner,
     };
     setStatusMessages((prev) => [...prev, message]);
-
-    return message;
+    return uuid;
   }, []);
 
-  const removeStatusMessage = useCallback((toPop: StatusMessage | string) => {
+  const removeStatusMessage = useCallback((uuid: string) => {
     setStatusMessages((prev) => {
-      if (typeof toPop === "string") {
-        return prev.filter((msg) => msg.content !== toPop);
-      }
-      return prev.filter((msg) => msg.uuid !== toPop.uuid);
+      return prev.filter((msg) => msg.uuid !== uuid);
     });
   }, []);
 
