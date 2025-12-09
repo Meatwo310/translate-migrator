@@ -23,7 +23,8 @@ export class JsonKVVisitor extends Visitor {
   }
 }
 
-const parseToJsonKV = (content: string) => {
+const parseToPropertyMap = (content?: string | null): PropertyMap => {
+  if (content == null) return new Map();
   const visitor = new JsonKVVisitor();
   visitor.visit(parseJson(content));
   return visitor.propertyMap;
@@ -84,8 +85,20 @@ const STRATEGIES: Record<PatchJsonParams["duplicatedKey"], SafeGetStrategy> = {
 export const patchJson = (
   {oldSource, source, target, duplicatedKey}: PatchJsonParams,
 ) => {
-  const sourceMap = parseToJsonKV(source);
-  const targetMap = parseToJsonKV(target);
+  const oldSourceMap = parseToPropertyMap(oldSource);
+  const sourceMap = parseToPropertyMap(source);
+  const changedKeys = oldSourceMap.keys()
+    .filter(key => {
+      const oldVal = oldSourceMap.get(key);
+      const val = sourceMap.get(key);
+      return oldVal?.length === 1
+        && oldVal.length === val?.length
+        && oldVal[0] !== val[0];
+    })
+    .toArray();
+  console.debug(changedKeys);
+
+  const targetMap = parseToPropertyMap(target);
 
   const getStrategy = STRATEGIES[duplicatedKey];
   const get = (key: string, fallbackValue: string) =>
@@ -96,7 +109,10 @@ export const patchJson = (
     .map(line => {
       const matches = line.match(/^([ \t]*)"([^"]*)"( *: *)"(.*)"(,? *)$/);
       if (!matches) return line;
+
       const [, indent, key, colon, value, comma] = matches;
+      if (changedKeys.includes(key)) return line;
+
       return `${indent}"${key}"${colon}"${get(key, value)}"${comma}`;
     })
     .join("\n");
