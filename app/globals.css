@@ -28,7 +28,6 @@ body {
 }
 
 .cli-spinner {
-  font-family: monospace;
   display: inline-block;
 }
 

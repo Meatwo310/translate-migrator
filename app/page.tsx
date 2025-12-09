@@ -34,8 +34,9 @@ export default function Home() {
     });
   }, []);
 
-  const statusText = useMemo(() => {
-    return editorsLoaded < 2 ? "Loading Monaco" : statusMessages.join(" / ");
+  const status = useMemo(() => {
+    return editorsLoaded < 2 ? <span className="cli-spinner">Loading Monaco</span> :
+      statusMessages.map((message) => <span key={message}>{message}</span>);
   }, [editorsLoaded, statusMessages]);
 
   const handleFirstEditorMount = (diffEditor: editor.IStandaloneDiffEditor) => {
@@ -64,7 +65,7 @@ export default function Home() {
       {/*<option value="json">json</option>*/}
       <option value="lang">lang</option>
     </select>
-    <span id="status" style={{ marginLeft: "0.5em", display: "inline-block" }}>{statusText}</span>
+    <span id="status" style={{ marginLeft: "0.5em", display: "inline-block" }}>{status}</span>
     <CustomDiffEditor onMount={handleFirstEditorMount}/>
     <CustomDiffEditor onMount={handleSecondEditorMount}/>
   </>);
