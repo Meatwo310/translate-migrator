@@ -25,6 +25,47 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+}
+
+main.page-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /*gap: 0.75rem;*/
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.status-messages {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.5em;
+}
+
+.editor-stack {
+  flex: 1;
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+.editor-shell {
+  min-height: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #f8fafc;
 }
 
 .cli-spinner {

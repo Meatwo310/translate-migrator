@@ -14,7 +14,7 @@ export const commonOptions: editor.IDiffEditorConstructionOptions = {
 export const CustomDiffEditor = (props: DiffEditorProps) => {
   return (
     <DiffEditor
-      height="50dvh"
+      height="100%"
       language="json"
       options={commonOptions}
       {...props}

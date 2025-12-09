@@ -30,22 +30,30 @@ export default function Home() {
   }, []);
 
   return (
-    <>
-      <label htmlFor="language">ファイル形式: </label>
-      <select id="language" defaultValue="lang">
-        <option value="lang">.lang</option>
-      </select>
+    <main className="page-layout">
+      <div className="status-bar">
+        <label htmlFor="language">ファイル形式:</label>
+        <select id="language" defaultValue="lang">
+          <option value="lang">.lang</option>
+        </select>
 
-      <span id="status" style={{marginLeft: "0.5em", display: "inline-block"}}>
-        {activeMessages.map((msg) => (
-          <span key={msg.uuid} className={msg.spinner ? "cli-spinner" : ""}>
-            {msg.content}
-          </span>
-        ))}
-      </span>
+        <span id="status" className="status-messages">
+          {activeMessages.map((msg) => (
+            <span key={msg.uuid} className={msg.spinner ? "cli-spinner" : ""}>
+              {msg.content}
+            </span>
+          ))}
+        </span>
+      </div>
 
-      <CustomDiffEditor onMount={handleFirstEditorMount}/>
-      <CustomDiffEditor onMount={handleSecondEditorMount}/>
-    </>
+      <div className="editor-stack">
+        <div className="editor-shell">
+          <CustomDiffEditor onMount={handleFirstEditorMount}/>
+        </div>
+        <div className="editor-shell">
+          <CustomDiffEditor onMount={handleSecondEditorMount}/>
+        </div>
+      </div>
+    </main>
   );
 }
