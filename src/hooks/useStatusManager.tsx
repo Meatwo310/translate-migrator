@@ -1,14 +1,15 @@
 "use client";
 
-import {useState, useMemo, useCallback} from "react";
+import {useCallback, useMemo, useState} from "react";
+import {randomUUID, UUID} from "node:crypto";
 
-type StatusMessage = {
-  uuid: string;
+export type StatusMessage = {
+  uuid: UUID;
   content: string;
   spinner?: boolean;
 };
 
-const defaultStatusMessage = {
+const defaultStatusMessage: StatusMessage = {
   uuid: "b3332455-b003-40fd-ba97-ce358099bf1d",
   content: "Loading Monaco",
   spinner: true,
@@ -18,9 +19,13 @@ export const useStatusManager = (isLoading: boolean) => {
   const [statusMessages, setStatusMessages] = useState<StatusMessage[]>([]);
 
   const pushStatusMessage = useCallback((content: string, spinner?: boolean) => {
-    const uuid = self.crypto.randomUUID();
-    const message = {content, spinner, uuid};
+    const message: StatusMessage = {
+      uuid: randomUUID(),
+      content,
+      spinner,
+    };
     setStatusMessages((prev) => [...prev, message]);
+
     return message;
   }, []);
 
@@ -33,23 +38,13 @@ export const useStatusManager = (isLoading: boolean) => {
     });
   }, []);
 
-  const statusMessage = useMemo(() => {
-    const messagesToShow = isLoading ? [defaultStatusMessage] : statusMessages;
-
-    return messagesToShow.map((message) => (
-      <span
-        key={message.uuid}
-        className={message.spinner ? "cli-spinner" : undefined}
-        style={{ marginRight: "0.5em" }}
-      >
-        {message.content}
-      </span>
-    ));
+  const activeMessages = useMemo(() => {
+    return isLoading ? [defaultStatusMessage] : statusMessages;
   }, [isLoading, statusMessages]);
 
   return {
     pushStatusMessage,
     removeStatusMessage,
-    statusMessage,
+    activeMessages,
   };
 };

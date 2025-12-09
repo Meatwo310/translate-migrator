@@ -7,7 +7,7 @@ import {useStatusManager} from "@/src/hooks/useStatusManager";
 
 export default function Home() {
   const [editorsLoaded, setEditorsLoaded] = useState(0);
-  const {statusMessage} = useStatusManager(editorsLoaded < 2);
+  const {activeMessages} = useStatusManager(editorsLoaded < 2);
 
   const handleFirstEditorMount = (diffEditor: editor.IStandaloneDiffEditor) => {
     diffEditor.getOriginalEditor().updateOptions({
@@ -37,7 +37,11 @@ export default function Home() {
       </select>
 
       <span id="status" style={{marginLeft: "0.5em", display: "inline-block"}}>
-        {statusMessage}
+        {activeMessages.map((msg) => (
+          <span key={msg.uuid} className={msg.spinner ? "cli-spinner" : ""}>
+            {msg.content}
+          </span>
+        ))}
       </span>
 
       <CustomDiffEditor onMount={handleFirstEditorMount}/>
