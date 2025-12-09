@@ -96,7 +96,6 @@ export const patchJson = (
         && oldVal[0] !== val[0];
     })
     .toArray();
-  console.debug(changedKeys);
 
   const targetMap = parseToPropertyMap(target);
 
