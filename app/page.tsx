@@ -2,12 +2,19 @@
 
 import {DiffEditor, DiffEditorProps} from "@monaco-editor/react";
 import {editor} from "monaco-editor";
-import {useCallback, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
+import {randomUUID, UUID} from "crypto";
 import IDiffEditorConstructionOptions = editor.IDiffEditorConstructionOptions;
 
 type StatusMessage = {
-  spinner?: boolean;
+  uuid: UUID;
   content: string;
+  spinner?: boolean;
+};
+const defaultStatusMessage = {
+  uuid: "b3332455-b003-40fd-ba97-ce358099bf1d",
+  content: "Loading Monaco",
+  spinner: true,
 };
 
 const commonOptions: IDiffEditorConstructionOptions = {
@@ -33,14 +40,30 @@ export default function Home() {
   const [editorsLoaded, setEditorsLoaded] = useState(0);
   const [statusMessages, setStatusMessages] = useState<StatusMessage[]>([]);
 
-  const pushStatusMessage = useCallback((message: StatusMessage) => {
+  const pushStatusMessage = (content: string, spinner?: boolean) => {
+    const message = {
+      content,
+      spinner,
+      uuid: randomUUID(),
+    };
     setStatusMessages((prev) => {
       return [...prev, message];
     });
-  }, []);
+    return message;
+  };
+
+  const removeStatusMessage = (toPop: StatusMessage | string) => {
+    setStatusMessages((prev) => {
+      const index = prev.findIndex(typeof toPop === "string"
+        ? (msg) => msg.content === toPop
+        : (msg) => msg.uuid === toPop.uuid,
+      );
+      return index === -1 ? prev : [...prev];
+    });
+  };
 
   const status = useMemo(() => {
-    return (editorsLoaded < 2 ? [{spinner: true, content: "Loading Monaco"}] : statusMessages)
+    return (editorsLoaded < 2 ? [defaultStatusMessage] : statusMessages)
       .map((message) => <span
         key={message.content}
         className={message.spinner ? "cli-spinner" : undefined}
