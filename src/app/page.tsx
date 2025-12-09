@@ -1,8 +1,10 @@
 "use client";
 
-import {useCallback, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {editor, languages} from "monaco-editor";
 import {useStatusManager} from "@/hooks/useStatusManager";
+import {patchJson} from "@/utils/jsonPatch";
+import {patchLang} from "@/utils/langPatch";
 import type {Monaco} from "@monaco-editor/react";
 import {DiffEditor} from "@monaco-editor/react";
 import ILanguageExtensionPoint = languages.ILanguageExtensionPoint;
@@ -50,6 +52,11 @@ const registerMinecraftLang = (monaco: Monaco) => {
 export default function Home() {
   const [editorsLoaded, setEditorsLoaded] = useState(0);
   const [language, setLanguage] = useState<"lang" | "json">("lang");
+  const [oldSource, setOldSource] = useState("");
+  const [source, setSource] = useState("");
+  const [target, setTarget] = useState("");
+  const [patched, setPatched] = useState("");
+  const secondDiffRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const languageId = useMemo(() => (language === "lang" ? minecraftLangId : "json"), [language]);
   const {activeMessages} = useStatusManager(editorsLoaded < 2);
 
@@ -64,10 +71,23 @@ export default function Home() {
     diffEditor.getModifiedEditor().updateOptions({
       placeholder: "翻訳元ファイルを貼り付けてください\nAlt+Shift+Fでフォーマット",
     });
+
+    const disposeOriginal = diffEditor.getOriginalEditor().onDidChangeModelContent(() => {
+      setOldSource(diffEditor.getOriginalEditor().getValue());
+    });
+    const disposeModified = diffEditor.getModifiedEditor().onDidChangeModelContent(() => {
+      setSource(diffEditor.getModifiedEditor().getValue());
+    });
+
+    diffEditor.onDidDispose(() => {
+      disposeOriginal.dispose();
+      disposeModified.dispose();
+    });
     setEditorsLoaded((prev) => prev + 1);
   }, []);
 
   const handleSecondEditorMount = useCallback((diffEditor: editor.IStandaloneDiffEditor) => {
+    secondDiffRef.current = diffEditor;
     diffEditor.getOriginalEditor().updateOptions({
       placeholder: "翻訳先ファイルを貼り付けてください",
     });
@@ -75,8 +95,44 @@ export default function Home() {
       placeholder: "翻訳元ファイルに翻訳先ファイルがパッチされます",
       readOnly: true,
     });
+
+    const disposeOriginal = diffEditor.getOriginalEditor().onDidChangeModelContent(() => {
+      setTarget(diffEditor.getOriginalEditor().getValue());
+    });
+
+    diffEditor.onDidDispose(() => {
+      disposeOriginal.dispose();
+    });
     setEditorsLoaded((prev) => prev + 1);
   }, []);
+
+  const applyPatch = useCallback(() => {
+    if (!source || !target) {
+      setPatched(target);
+      return;
+    }
+
+    try {
+      const next = language === "json"
+        ? patchJson({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"})
+        : patchLang({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"});
+      setPatched(next);
+    } catch (error) {
+      setPatched(target);
+    }
+  }, [language, oldSource, source, target]);
+
+  useEffect(() => {
+    applyPatch();
+  }, [applyPatch]);
+
+  useEffect(() => {
+    const modifiedEditor = secondDiffRef.current?.getModifiedEditor();
+    if (!modifiedEditor) return;
+    const current = modifiedEditor.getValue();
+    if (current === patched) return;
+    modifiedEditor.setValue(patched);
+  }, [patched]);
 
   return (
     <main className="flex min-h-screen bg-background text-foreground font-sans antialiased">
