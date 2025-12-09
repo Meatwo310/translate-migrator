@@ -10,8 +10,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "@anchan828/json-ast": "^2.2.58",
     "@monaco-editor/react": "^4.7.0",
     "monaco-editor": "0.55.1",
+    "neverthrow": "^8.2.0",
     "next": "16.0.8",
     "react": "19.2.1",
     "react-dom": "19.2.1"

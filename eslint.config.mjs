@@ -27,7 +27,9 @@ const eslintConfig = defineConfig([
       "semi": "error",
       "indent": ["error", 2],
       "no-trailing-spaces": "error",
-      "quotes": ["error", "double"],
+      "quotes": ["error", "double", {
+        "avoidEscape": true,
+      }],
       "comma-dangle": ["error", "always-multiline"],
     },
   },
