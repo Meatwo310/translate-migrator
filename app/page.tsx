@@ -25,6 +25,11 @@ const CustomDiffEditor = (props: DiffEditorProps) => {
 
 export default function Home() {
   return (<>
+    <label htmlFor="language">言語: </label>
+    <select id="language">
+      <option value="json">.json</option>
+      <option value="lang">.lang</option>
+    </select>
     <CustomDiffEditor />
     <CustomDiffEditor />
   </>);
