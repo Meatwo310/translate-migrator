@@ -1,9 +1,11 @@
 "use client";
 
-import {useCallback, useState} from "react";
-import {editor} from "monaco-editor";
+import {useCallback, useMemo, useState} from "react";
+import {editor, languages} from "monaco-editor";
 import {useStatusManager} from "@/hooks/useStatusManager";
-import {DiffEditor, Editor} from "@monaco-editor/react";
+import type {Monaco} from "@monaco-editor/react";
+import {DiffEditor} from "@monaco-editor/react";
+import ILanguageExtensionPoint = languages.ILanguageExtensionPoint;
 
 const commonOptions: editor.IDiffEditorConstructionOptions = {
   enableSplitViewResizing: true,
@@ -13,9 +15,47 @@ const commonOptions: editor.IDiffEditorConstructionOptions = {
   readOnly: false,
 };
 
+const minecraftLangId = "minecraft-lang";
+
+const registerMinecraftLang = (monaco: Monaco) => {
+  const alreadyRegistered = monaco.languages.getLanguages()
+    .some((lang: ILanguageExtensionPoint) => lang.id === minecraftLangId);
+  if (alreadyRegistered) return;
+
+  monaco.languages.register({
+    id: minecraftLangId,
+    extensions: [".lang"],
+    aliases: ["Minecraft Lang", "minecraft-lang"],
+  });
+
+  monaco.languages.setLanguageConfiguration(minecraftLangId, {
+    comments: {
+      lineComment: "#",
+    },
+  });
+
+  monaco.languages.setMonarchTokensProvider(minecraftLangId, {
+    tokenizer: {
+      root: [
+        [/^[\s]*[#;].*$/, "comment"],
+        [/^[^=#\s][^=]*?(?==)/, "key"],
+        [/=/, "delimiter"],
+        [/"([^"\\]|\\.)*"/, "string"],
+        [/[^#;]+$/, "string"],
+      ],
+    },
+  });
+};
+
 export default function Home() {
   const [editorsLoaded, setEditorsLoaded] = useState(0);
+  const [language, setLanguage] = useState<"lang" | "json">("lang");
+  const languageId = useMemo(() => (language === "lang" ? minecraftLangId : "json"), [language]);
   const {activeMessages} = useStatusManager(editorsLoaded < 2);
+
+  const handleBeforeMount = useCallback((monaco: Monaco) => {
+    registerMinecraftLang(monaco);
+  }, []);
 
   const handleFirstEditorMount = useCallback((diffEditor: editor.IStandaloneDiffEditor) => {
     diffEditor.getOriginalEditor().updateOptions({
@@ -47,9 +87,11 @@ export default function Home() {
           </label>
           <select
             id="language"
-            defaultValue="lang"
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as "lang" | "json")}
             className="h-8 rounded-md border border-neutral-200 bg-white px-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
           >
+            <option value="json">.json</option>
             <option value="lang">.lang</option>
           </select>
 
@@ -71,6 +113,8 @@ export default function Home() {
               height="100%"
               options={commonOptions}
               onMount={handleFirstEditorMount}
+              beforeMount={handleBeforeMount}
+              language={languageId}
             />
           </div>
           <div className="min-h-0 overflow-hidden rounded-lg border border-neutral-200 bg-slate-50 shadow-sm">
@@ -78,6 +122,8 @@ export default function Home() {
               height="100%"
               options={commonOptions}
               onMount={handleSecondEditorMount}
+              beforeMount={handleBeforeMount}
+              language={languageId}
             />
           </div>
         </div>
