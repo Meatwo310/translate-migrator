@@ -91,10 +91,10 @@ export default function Home() {
   };
 
   return (<>
-    <label htmlFor="language">言語: </label>
+    <label htmlFor="language">ファイル形式: </label>
     <select id="language">
-      {/*<option value="json">json</option>*/}
-      <option value="lang">lang</option>
+      {/*<option value="json">.json</option>*/}
+      <option value="lang">.lang</option>
     </select>
     <span id="status" style={{marginLeft: "0.5em", display: "inline-block"}}>{status}</span>
     <CustomDiffEditor onMount={handleFirstEditorMount}/>
