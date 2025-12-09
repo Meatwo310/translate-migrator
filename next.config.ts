@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  basePath: "/translate-migrator",
+  basePath: process.env.BASE_PATH,
   output: "export",
 };
 
