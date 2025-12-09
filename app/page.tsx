@@ -1,36 +1,31 @@
 "use client";
 
-import {DiffEditor, Monaco, MonacoDiffEditor} from "@monaco-editor/react";
+import {DiffEditor, DiffEditorProps} from "@monaco-editor/react";
+import {editor} from "monaco-editor";
+import IDiffEditorConstructionOptions = editor.IDiffEditorConstructionOptions;
+
+const commonOptions: IDiffEditorConstructionOptions = {
+  enableSplitViewResizing: true,
+  renderSideBySide: true,
+  automaticLayout: true,
+  originalEditable: true,
+  readOnly: false,
+};
+
+const CustomDiffEditor = (props: DiffEditorProps) => {
+  return (
+    <DiffEditor
+      height="50dvh"
+      language="json"
+      options={commonOptions}
+      {...props}
+    />
+  );
+};
 
 export default function Home() {
-  function handleEditorDidMount(editor: MonacoDiffEditor, monaco: Monaco) {
-    // console.log("Editor mounted:", editor, monaco);
-  }
-
   return (<>
-    <DiffEditor
-      height="50dvh"
-      language="json"
-      onMount={handleEditorDidMount}
-      options={{
-        enableSplitViewResizing: true,
-        renderSideBySide: true,
-        automaticLayout: true,
-        originalEditable: true,
-        readOnly: false,
-      }}
-    />
-    <DiffEditor
-      height="50dvh"
-      language="json"
-      onMount={handleEditorDidMount}
-      options={{
-        enableSplitViewResizing: true,
-        renderSideBySide: true,
-        automaticLayout: true,
-        originalEditable: true,
-        readOnly: false,
-      }}
-    />
+    <CustomDiffEditor />
+    <CustomDiffEditor />
   </>);
 };
