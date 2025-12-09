@@ -2,8 +2,16 @@
 
 import {useCallback, useState} from "react";
 import {editor} from "monaco-editor";
-import {CustomDiffEditor} from "@/components/CustomDiffEditor";
 import {useStatusManager} from "@/hooks/useStatusManager";
+import {DiffEditor, Editor} from "@monaco-editor/react";
+
+const commonOptions: editor.IDiffEditorConstructionOptions = {
+  enableSplitViewResizing: true,
+  renderSideBySide: true,
+  automaticLayout: true,
+  originalEditable: true,
+  readOnly: false,
+};
 
 export default function Home() {
   const [editorsLoaded, setEditorsLoaded] = useState(0);
@@ -11,10 +19,10 @@ export default function Home() {
 
   const handleFirstEditorMount = useCallback((diffEditor: editor.IStandaloneDiffEditor) => {
     diffEditor.getOriginalEditor().updateOptions({
-      placeholder: "[任意] 旧バージョンの翻訳元ファイルを貼り付けてください\n新バージョンの翻訳元ファイルと差異がある場合パッチがスキップされます",
+      placeholder: "[任意] 古い翻訳元ファイルを貼り付けてください\n新しい翻訳元ファイルと差異があるキーはパッチされません",
     });
     diffEditor.getModifiedEditor().updateOptions({
-      placeholder: "翻訳元ファイルを貼り付けてください",
+      placeholder: "翻訳元ファイルを貼り付けてください\nAlt+Shift+Fでフォーマット",
     });
     setEditorsLoaded((prev) => prev + 1);
   }, []);
@@ -24,7 +32,8 @@ export default function Home() {
       placeholder: "翻訳先ファイルを貼り付けてください",
     });
     diffEditor.getModifiedEditor().updateOptions({
-      placeholder: "翻訳元ファイルに翻訳先ファイルがパッチされ表示されます",
+      placeholder: "翻訳元ファイルに翻訳先ファイルがパッチされます",
+      readOnly: true,
     });
     setEditorsLoaded((prev) => prev + 1);
   }, []);
@@ -58,10 +67,18 @@ export default function Home() {
 
         <div className="grid min-h-[60vh] flex-1 grid-rows-2 gap-3 md:gap-4">
           <div className="min-h-0 overflow-hidden rounded-lg border border-neutral-200 bg-slate-50 shadow-sm">
-            <CustomDiffEditor onMount={handleFirstEditorMount}/>
+            <DiffEditor
+              height="100%"
+              options={commonOptions}
+              onMount={handleFirstEditorMount}
+            />
           </div>
           <div className="min-h-0 overflow-hidden rounded-lg border border-neutral-200 bg-slate-50 shadow-sm">
-            <CustomDiffEditor onMount={handleSecondEditorMount}/>
+            <DiffEditor
+              height="100%"
+              options={commonOptions}
+              onMount={handleSecondEditorMount}
+            />
           </div>
         </div>
       </div>
