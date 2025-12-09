@@ -5,6 +5,11 @@ import {editor} from "monaco-editor";
 import {useCallback, useMemo, useState} from "react";
 import IDiffEditorConstructionOptions = editor.IDiffEditorConstructionOptions;
 
+type StatusMessage = {
+  spinner?: boolean;
+  content: string;
+};
+
 const commonOptions: IDiffEditorConstructionOptions = {
   enableSplitViewResizing: true,
   renderSideBySide: true,
@@ -26,17 +31,20 @@ const CustomDiffEditor = (props: DiffEditorProps) => {
 
 export default function Home() {
   const [editorsLoaded, setEditorsLoaded] = useState(0);
-  const [statusMessages, setStatusMessages] = useState<string[]>([]);
+  const [statusMessages, setStatusMessages] = useState<StatusMessage[]>([]);
 
-  const pushStatusMessage = useCallback((message: string) => {
+  const pushStatusMessage = useCallback((message: StatusMessage) => {
     setStatusMessages((prev) => {
       return [...prev, message];
     });
   }, []);
 
   const status = useMemo(() => {
-    return editorsLoaded < 2 ? <span className="cli-spinner">Loading Monaco</span> :
-      statusMessages.map((message) => <span key={message}>{message}</span>);
+    return (editorsLoaded < 2 ? [{spinner: true, content: "Loading Monaco"}] : statusMessages)
+      .map((message) => <span
+        key={message.content}
+        className={message.spinner ? "cli-spinner" : undefined}
+      >{message.content}</span>);
   }, [editorsLoaded, statusMessages]);
 
   const handleFirstEditorMount = (diffEditor: editor.IStandaloneDiffEditor) => {
