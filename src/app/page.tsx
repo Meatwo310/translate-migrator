@@ -51,11 +51,10 @@ const registerMinecraftLang = (monaco: Monaco) => {
 
 export default function Home() {
   const [editorsLoaded, setEditorsLoaded] = useState(0);
-  const [language, setLanguage] = useState<"lang" | "json">("lang");
+  const [language, setLanguage] = useState<"lang" | "json">("json");
   const [oldSource, setOldSource] = useState("");
   const [source, setSource] = useState("");
   const [target, setTarget] = useState("");
-  const [patched, setPatched] = useState("");
   const secondDiffRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const languageId = useMemo(() => (language === "lang" ? minecraftLangId : "json"), [language]);
   const {activeMessages} = useStatusManager(editorsLoaded < 2);
@@ -106,25 +105,17 @@ export default function Home() {
     setEditorsLoaded((prev) => prev + 1);
   }, []);
 
-  const applyPatch = useCallback(() => {
-    if (!source || !target) {
-      setPatched(target);
-      return;
-    }
+  const patched = useMemo(() => {
+    if (!source || !target) return target;
 
     try {
-      const next = language === "json"
+      return language === "json"
         ? patchJson({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"})
         : patchLang({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"});
-      setPatched(next);
-    } catch (error) {
-      setPatched(target);
+    } catch (_err) {
+      return target;
     }
   }, [language, oldSource, source, target]);
-
-  useEffect(() => {
-    applyPatch();
-  }, [applyPatch]);
 
   useEffect(() => {
     const modifiedEditor = secondDiffRef.current?.getModifiedEditor();
