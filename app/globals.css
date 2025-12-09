@@ -26,3 +26,25 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.cli-spinner {
+  font-family: monospace;
+  display: inline-block;
+}
+
+.cli-spinner::before {
+  font-family: monospace;
+  content: "|";
+  display: inline-block;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  animation: spin 2s steps(8) infinite;
+}
+
+@keyframes spin {
+  0%   { content: "|"; }
+  25%  { content: "/"; }
+  50%  { content: "-"; }
+  75%  { content: "\\"; }
+  100% { content: "|"; }
+}
