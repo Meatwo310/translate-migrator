@@ -1,27 +1,35 @@
 {
   "name": "translate-migrator",
-  "version": "0.0.1",
-  "description": "Translation migration tool using Monaco Editor for diff visualization.",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "jest"
   },
   "dependencies": {
-    "monaco-editor": "^0.55.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@anchan828/json-ast": "^2.2.58",
+    "@monaco-editor/react": "^4.7.0",
+    "monaco-editor": "0.55.1",
+    "neverthrow": "^8.2.0",
+    "next": "16.0.8",
+    "react": "19.2.1",
+    "react-dom": "19.2.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^5.1.1",
-    "vite": "^7.2.6",
-    "vite-plugin-monaco-editor": "^1.1.0"
-  },
-  "packageManager": "pnpm@10.13.1",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
+    "@stylistic/eslint-plugin": "^5.6.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.8",
+    "jest": "^30.2.0",
+    "tailwindcss": "^4",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5"
   }
 }

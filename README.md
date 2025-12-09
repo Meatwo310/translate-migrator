@@ -1,36 +1,36 @@
-# Translate Migrator
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Translation migration tool using Monaco Editor for diff visualization.
+## Getting Started
 
-## GitHub Pages Deployment
-
-This project is automatically deployed to GitHub Pages at: **[meatwo310.github.io/translate-migrator](https://meatwo310.github.io/translate-migrator)**
-
-### How it works
-
-1. When changes are pushed to the `main` branch, GitHub Actions automatically builds and deploys the project
-2. The build process uses Vite to generate optimized static files in the `dist/` directory
-3. These files are then deployed to GitHub Pages using the `gh-pages` branch
-
-### Local Development
+First, run the development server:
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Start development server
+npm run dev
+# or
+yarn dev
+# or
 pnpm dev
-
-# Build for production
-pnpm build
+# or
+bun dev
 ```
 
-### Workflow Configuration
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-The GitHub Actions workflow (`.github/workflows/deploy.yml`) handles:
-- Node.js environment setup
-- Dependency installation via pnpm
-- Production build
-- Deployment to GitHub Pages
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-The Vite configuration is optimized for GitHub Pages subpath deployment using the correct `base` setting.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
