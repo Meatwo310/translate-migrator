@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@layer components {
+  .cli-spinner {
+    @apply inline-flex items-center;
+  }
+
+  .cli-spinner::before {
+    content: "|";
+    @apply inline-block mx-2 font-mono;
+    animation: cli-spinner-frames 1s steps(8) infinite;
+  }
+}
+
+@keyframes cli-spinner-frames {
+  0%   { content: "|"; }
+  25%  { content: "/"; }
+  50%  { content: "-"; }
+  75%  { content: "\\"; }
+  100% { content: "|"; }
+}

@@ -29,23 +29,3 @@ body {
   margin: 0;
 }
 
-.cli-spinner {
-  display: inline-block;
-}
-
-.cli-spinner::before {
-  font-family: monospace;
-  content: "|";
-  display: inline-block;
-  margin-left: 0.5em;
-  margin-right: 0.5em;
-  animation: spin 1s steps(8) infinite;
-}
-
-@keyframes spin {
-  0%   { content: "|"; }
-  25%  { content: "/"; }
-  50%  { content: "-"; }
-  75%  { content: "\\"; }
-  100% { content: "|"; }
-}
