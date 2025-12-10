@@ -87,6 +87,11 @@ export const patchJson = (
 ) => {
   const oldSourceMap = parseToPropertyMap(oldSource);
   const sourceMap = parseToPropertyMap(source);
+  const duplicatedSourceKeys = new Set(
+    Array.from(sourceMap.entries())
+      .filter(([, values]) => values.length > 1)
+      .map(([key]) => key),
+  );
   const changedKeys = oldSourceMap.keys()
     .filter(key => {
       const oldVal = oldSourceMap.get(key);
@@ -110,7 +115,9 @@ export const patchJson = (
       if (!matches) return line;
 
       const [, indent, key, colon, value, comma] = matches;
-      if (changedKeys.includes(key)) return line;
+      if (changedKeys.includes(key) || (duplicatedKey === "ignore" && duplicatedSourceKeys.has(key))) {
+        return line;
+      }
 
       return `${indent}"${key}"${colon}"${get(key, value)}"${comma}`;
     })

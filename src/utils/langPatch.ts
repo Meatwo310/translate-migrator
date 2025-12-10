@@ -83,6 +83,11 @@ export const patchLang = (
 ) => {
   const oldSourceMap = parseToPropertyMap(oldSource);
   const sourceMap = parseToPropertyMap(source);
+  const duplicatedSourceKeys = new Set(
+    Array.from(sourceMap.entries())
+      .filter(([, values]) => values.length > 1)
+      .map(([key]) => key),
+  );
 
   const changedKeys = Array.from(oldSourceMap.keys())
     .filter(key => {
@@ -103,7 +108,9 @@ export const patchLang = (
       const commentMatch = line.match(/^([ \t]*)#(.*)$/);
       if (commentMatch) {
         const [, indent, comment] = commentMatch;
-        if (changedKeys.includes(COMMENT_KEY)) return line;
+        if (changedKeys.includes(COMMENT_KEY) || (duplicatedKey === "ignore" && duplicatedSourceKeys.has(COMMENT_KEY))) {
+          return line;
+        }
         return `${indent}#${get(COMMENT_KEY, comment)}`;
       }
 
@@ -111,7 +118,9 @@ export const patchLang = (
       if (!matches) return line;
 
       const [, indent, key, separator, value] = matches;
-      if (changedKeys.includes(key)) return line;
+      if (changedKeys.includes(key) || duplicatedKey === "ignore" && duplicatedSourceKeys.has(key)) {
+        return line;
+      }
 
       return `${indent}${key}${separator}${get(key, value)}`;
     })
