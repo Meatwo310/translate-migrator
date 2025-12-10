@@ -132,4 +132,31 @@ entity.examplemod.custom_mob=Custom Mob`,
       expect(patchLang({oldSource, source, target, duplicatedKey: strategy})).toBe(expected[strategy]),
     );
   });
+
+  describe("handles duplicate keys in source with single target value", () => {
+    const source = `duplicatedKey=Foo
+duplicatedKey=Bar
+duplicatedKey=Baz`;
+
+    const target = "duplicatedKey=pop";
+
+    const expected = {
+      ignore: `duplicatedKey=Foo
+duplicatedKey=Bar
+duplicatedKey=Baz`,
+      first: `duplicatedKey=pop
+duplicatedKey=pop
+duplicatedKey=pop`,
+      last: `duplicatedKey=pop
+duplicatedKey=pop
+duplicatedKey=pop`,
+      pop: `duplicatedKey=pop
+duplicatedKey=Bar
+duplicatedKey=Baz`,
+    } as const;
+
+    test.each(duplicatedKeyStrategies)("(duplicatedKey=%s)", strategy =>
+      expect(patchLang({source, target, duplicatedKey: strategy})).toBe(expected[strategy]),
+    );
+  });
 });
