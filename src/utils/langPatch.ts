@@ -88,9 +88,15 @@ export const patchLang = (
     .filter(key => {
       const oldVal = oldSourceMap.get(key);
       const val = sourceMap.get(key);
-      return oldVal?.length === 1
-				&& oldVal.length === val?.length
-				&& oldVal[0] !== val[0];
+
+      if (oldVal == null || val == null) return false;
+
+      if (key === COMMENT_KEY) {
+        if (oldVal.length !== val.length) return true;
+        return oldVal.some((value, index) => value !== val[index]);
+      }
+
+      return oldVal.length === 1 && oldVal.length === val.length && oldVal[0] !== val[0];
     });
 
   const targetMap = parseToPropertyMap(target);

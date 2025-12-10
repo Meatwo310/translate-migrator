@@ -132,4 +132,44 @@ entity.examplemod.custom_mob=Custom Mob`,
       expect(patchLang({oldSource, source, target, duplicatedKey: strategy})).toBe(expected[strategy]),
     );
   });
+
+  describe("keeps comments in source when changedKeys contains comment key", () => {
+    const oldSource = `# Old comment
+foo=Foo`;
+
+    const source = `# Updated comment
+foo=Foo`;
+
+    const target = `# Target comment
+foo=Bar`;
+
+    const expected = `# Updated comment
+foo=Bar`;
+
+    test.each(duplicatedKeyStrategies)("(duplicatedKey=%s)", strategy =>
+      expect(patchLang({oldSource, source, target, duplicatedKey: strategy})).toBe(expected),
+    );
+  });
+
+  describe("keeps multiple comments in source when comment lines change", () => {
+    const oldSource = `# Old comment
+# Another old comment
+foo=Foo`;
+
+    const source = `# Updated comment
+# Another updated comment
+foo=Foo`;
+
+    const target = `# Target comment
+# Another target comment
+foo=Bar`;
+
+    const expected = `# Updated comment
+# Another updated comment
+foo=Bar`;
+
+    test.each(duplicatedKeyStrategies)("(duplicatedKey=%s)", strategy =>
+      expect(patchLang({oldSource, source, target, duplicatedKey: strategy})).toBe(expected),
+    );
+  });
 });
