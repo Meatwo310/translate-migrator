@@ -141,9 +141,9 @@ duplicatedKey=Baz`;
     const target = "duplicatedKey=pop";
 
     const expected = {
-      ignore: `duplicatedKey=pop
-duplicatedKey=pop
-duplicatedKey=pop`,
+      ignore: `duplicatedKey=Foo
+duplicatedKey=Bar
+duplicatedKey=Baz`,
       first: `duplicatedKey=pop
 duplicatedKey=pop
 duplicatedKey=pop`,

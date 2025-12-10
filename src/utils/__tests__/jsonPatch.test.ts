@@ -171,9 +171,9 @@ describe("patchJson", () => {
 
     const expected = {
       ignore: `{
-  "duplicatedKey": "pop",
-  "duplicatedKey": "pop",
-  "duplicatedKey": "pop"
+  "duplicatedKey": "Foo",
+  "duplicatedKey": "Bar",
+  "duplicatedKey": "Baz"
 }`,
       first: `{
   "duplicatedKey": "pop",
