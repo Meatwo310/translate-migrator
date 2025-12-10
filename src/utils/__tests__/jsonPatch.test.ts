@@ -138,4 +138,23 @@ describe("patchJson", () => {
       expect(patchJson({oldSource, source, target, duplicatedKey: strategy})).toBe(expected[strategy]),
     );
   });
+
+  describe("skips non-string values in target", () => {
+    const source = `{
+  "foo": "Foo",
+  "bar": "Bar"
+}`;
+    const target = `{
+  "foo": 123,
+  "bar": {"baz": "Baz"}
+}`;
+    const expected = `{
+  "foo": "Foo",
+  "bar": "Bar"
+}`;
+
+    test.each(duplicatedKeyStrategies)("(duplicatedKey=%s)", strategy =>
+      expect(patchJson({source, target, duplicatedKey: strategy})).toBe(expected),
+    );
+  });
 });
