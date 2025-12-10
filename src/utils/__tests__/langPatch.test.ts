@@ -159,4 +159,37 @@ duplicatedKey=Baz`,
       expect(patchLang({source, target, duplicatedKey: strategy})).toBe(expected[strategy]),
     );
   });
+
+  describe("avoids overriding updated comments while replacing values", () => {
+    const oldSource = `# Old heading
+foo=Foo
+foo=Bar`;
+
+    const source = `# Updated heading
+foo=Foo
+foo=Bar`;
+
+    const target = `# 日本語の見出し
+foo=Hoge
+foo=Piyo`;
+
+    const expected = {
+      ignore: `# Updated heading
+foo=Foo
+foo=Bar`,
+      first: `# Updated heading
+foo=Hoge
+foo=Hoge`,
+      last: `# Updated heading
+foo=Piyo
+foo=Piyo`,
+      pop: `# Updated heading
+foo=Hoge
+foo=Piyo`,
+    } as const;
+
+    test.each(duplicatedKeyStrategies)("(duplicatedKey=%s)", strategy =>
+      expect(patchLang({oldSource, source, target, duplicatedKey: strategy})).toBe(expected[strategy]),
+    );
+  });
 });
