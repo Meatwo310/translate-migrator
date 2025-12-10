@@ -132,4 +132,20 @@ entity.examplemod.custom_mob=Custom Mob`,
       expect(patchLang({oldSource, source, target, duplicatedKey: strategy})).toBe(expected[strategy]),
     );
   });
+
+  describe("replaces only the first duplicated key when target has a single value", () => {
+    const source = `duplicatedKey=Source Value 1
+duplicatedKey=Source Value 2
+duplicatedKey=Source Value 3`;
+
+    const target = "duplicatedKey=Target Value";
+
+    const expected = `duplicatedKey=Target Value
+duplicatedKey=Source Value 2
+duplicatedKey=Source Value 3`;
+
+    it("uses the target value only for the first occurrence with duplicatedKey=pop", () => {
+      expect(patchLang({source, target, duplicatedKey: "pop"})).toBe(expected);
+    });
+  });
 });
