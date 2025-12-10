@@ -118,7 +118,7 @@ export const patchLang = (
       if (!matches) return line;
 
       const [, indent, key, separator, value] = matches;
-      if (changedKeys.includes(key) || duplicatedKey === "ignore" && duplicatedSourceKeys.has(key)) {
+      if (changedKeys.includes(key) || (duplicatedKey === "ignore" && duplicatedSourceKeys.has(key))) {
         return line;
       }
 
