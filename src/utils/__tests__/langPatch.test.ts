@@ -160,6 +160,39 @@ duplicatedKey=Baz`,
     );
   });
 
+  describe("handles multiple duplicate keys and target values", () => {
+    const source = `duplicatedKey=Foo
+duplicatedKey=Bar
+duplicatedKey=Baz
+duplicatedKey=Qux`;
+
+    const target = `duplicatedKey=First
+duplicatedKey=Second`;
+
+    const expected = {
+      ignore: `duplicatedKey=Foo
+duplicatedKey=Bar
+duplicatedKey=Baz
+duplicatedKey=Qux`,
+      first: `duplicatedKey=First
+duplicatedKey=First
+duplicatedKey=First
+duplicatedKey=First`,
+      last: `duplicatedKey=Second
+duplicatedKey=Second
+duplicatedKey=Second
+duplicatedKey=Second`,
+      pop: `duplicatedKey=First
+duplicatedKey=Second
+duplicatedKey=Baz
+duplicatedKey=Qux`,
+    } as const;
+
+    test.each(duplicatedKeyStrategies)("(duplicatedKey=%s)", strategy =>
+      expect(patchLang({source, target, duplicatedKey: strategy})).toBe(expected[strategy]),
+    );
+  });
+
   describe("avoids overriding updated comments while replacing values", () => {
     const oldSource = `# Old heading
 foo=Foo
