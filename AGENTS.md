@@ -4,7 +4,7 @@
 - よく使う`pnpm`サブコマンドの例:
   - 依存関係のインストール: `pnpm install`
   - 開発サーバー起動: `pnpm dev`
-  - 型・静的解析: `pnpm lint`
+  - 型・静的解析: `pnpm lint` / `pnpm typecheck`
   - テスト実行: `pnpm test`
   - 本番ビルド作成: `pnpm build`
 - ドキュメントを更新するときは、日本語を主体としつつ見出しや要点に英語の補足を併記してください（例: `## 使い方 / Usage`）。
