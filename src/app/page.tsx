@@ -81,16 +81,16 @@ export default function Home() {
       if (originalModel) {
         const markers = monaco.editor.getModelMarkers({ resource: originalModel.uri });
         const errors = markers
-          .filter((m) => m.severity === monaco.MarkerSeverity.Error)
-          .map((m) => `[古い翻訳元] Line ${m.startLineNumber}: ${m.message}`)
+          .filter((m: editor.IMarker) => m.severity === monaco.MarkerSeverity.Error)
+          .map((m: editor.IMarker) => `[古い翻訳元] Line ${m.startLineNumber}: ${m.message}`)
           .join("\n");
         setMarkerErrors((prev) => (prev.oldSource === (errors || null) ? prev : { ...prev, oldSource: errors || null }));
       }
       if (modifiedModel) {
         const markers = monaco.editor.getModelMarkers({ resource: modifiedModel.uri });
         const errors = markers
-          .filter((m) => m.severity === monaco.MarkerSeverity.Error)
-          .map((m) => `[翻訳元] Line ${m.startLineNumber}: ${m.message}`)
+          .filter((m: editor.IMarker) => m.severity === monaco.MarkerSeverity.Error)
+          .map((m: editor.IMarker) => `[翻訳元] Line ${m.startLineNumber}: ${m.message}`)
           .join("\n");
         setMarkerErrors((prev) => (prev.source === (errors || null) ? prev : { ...prev, source: errors || null }));
       }
@@ -131,8 +131,8 @@ export default function Home() {
       if (originalModel) {
         const markers = monaco.editor.getModelMarkers({ resource: originalModel.uri });
         const errors = markers
-          .filter((m) => m.severity === monaco.MarkerSeverity.Error)
-          .map((m) => `[翻訳先] Line ${m.startLineNumber}: ${m.message}`)
+          .filter((m: editor.IMarker) => m.severity === monaco.MarkerSeverity.Error)
+          .map((m: editor.IMarker) => `[翻訳先] Line ${m.startLineNumber}: ${m.message}`)
           .join("\n");
         setMarkerErrors((prev) => (prev.target === (errors || null) ? prev : { ...prev, target: errors || null }));
       }
