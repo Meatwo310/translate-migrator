@@ -83,7 +83,7 @@ export default function Home() {
         const errors = markers
           .filter((m) => m.severity === monaco.MarkerSeverity.Error)
           .map((m) => `[古い翻訳元] Line ${m.startLineNumber}: ${m.message}`)
-          .join('\n');
+          .join("\n");
         setMarkerErrors((prev) => (prev.oldSource === (errors || null) ? prev : { ...prev, oldSource: errors || null }));
       }
       if (modifiedModel) {
@@ -91,7 +91,7 @@ export default function Home() {
         const errors = markers
           .filter((m) => m.severity === monaco.MarkerSeverity.Error)
           .map((m) => `[翻訳元] Line ${m.startLineNumber}: ${m.message}`)
-          .join('\n');
+          .join("\n");
         setMarkerErrors((prev) => (prev.source === (errors || null) ? prev : { ...prev, source: errors || null }));
       }
     };
@@ -133,7 +133,7 @@ export default function Home() {
         const errors = markers
           .filter((m) => m.severity === monaco.MarkerSeverity.Error)
           .map((m) => `[翻訳先] Line ${m.startLineNumber}: ${m.message}`)
-          .join('\n');
+          .join("\n");
         setMarkerErrors((prev) => (prev.target === (errors || null) ? prev : { ...prev, target: errors || null }));
       }
     };
@@ -165,8 +165,9 @@ export default function Home() {
       return language === "json"
         ? patchJson({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"})
         : patchLang({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"});
-    } catch (err: any) {
-      return `エラーが発生しました:\n${err.message ?? err}`;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      return `エラーが発生しました:\n${message}`;
     }
   }, [language, oldSource, source, target, markerErrors]);
 
