@@ -49,6 +49,8 @@ const registerMinecraftLang = (monaco: Monaco) => {
   });
 };
 
+type MarkerErrors = { oldSource: string | null; source: string | null; target: string | null };
+
 export default function Home() {
   const [editorsLoaded, setEditorsLoaded] = useState(0);
   const [language, setLanguage] = useState<"lang" | "json">("json");
@@ -58,17 +60,44 @@ export default function Home() {
   const secondDiffRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const languageId = useMemo(() => (language === "lang" ? minecraftLangId : "json"), [language]);
   const {activeMessages} = useStatusManager(editorsLoaded < 2);
+  const [markerErrors, setMarkerErrors] = useState<MarkerErrors>({ oldSource: null, source: null, target: null });
 
   const handleBeforeMount = useCallback((monaco: Monaco) => {
     registerMinecraftLang(monaco);
   }, []);
 
-  const handleFirstEditorMount = useCallback((diffEditor: editor.IStandaloneDiffEditor) => {
+  const handleFirstEditorMount = useCallback((diffEditor: editor.IStandaloneDiffEditor, monaco: Monaco) => {
     diffEditor.getOriginalEditor().updateOptions({
       placeholder: "[任意] 古い翻訳元ファイルを貼り付けてください\n新しい翻訳元ファイルと差異があるキーはパッチされません",
     });
     diffEditor.getModifiedEditor().updateOptions({
       placeholder: "翻訳元ファイルを貼り付けてください\nAlt+Shift+Fでフォーマット",
+    });
+
+    const originalModel = diffEditor.getOriginalEditor().getModel();
+    const modifiedModel = diffEditor.getModifiedEditor().getModel();
+
+    const updateMarkers = () => {
+      if (originalModel) {
+        const markers = monaco.editor.getModelMarkers({ resource: originalModel.uri });
+        const errors = markers
+          .filter((m) => m.severity === monaco.MarkerSeverity.Error)
+          .map((m) => `[古い翻訳元] Line ${m.startLineNumber}: ${m.message}`)
+          .join('\n');
+        setMarkerErrors((prev) => (prev.oldSource === (errors || null) ? prev : { ...prev, oldSource: errors || null }));
+      }
+      if (modifiedModel) {
+        const markers = monaco.editor.getModelMarkers({ resource: modifiedModel.uri });
+        const errors = markers
+          .filter((m) => m.severity === monaco.MarkerSeverity.Error)
+          .map((m) => `[翻訳元] Line ${m.startLineNumber}: ${m.message}`)
+          .join('\n');
+        setMarkerErrors((prev) => (prev.source === (errors || null) ? prev : { ...prev, source: errors || null }));
+      }
+    };
+
+    const disposeMarkers = monaco.editor.onDidChangeMarkers(() => {
+      updateMarkers();
     });
 
     const disposeOriginal = diffEditor.getOriginalEditor().onDidChangeModelContent(() => {
@@ -81,11 +110,12 @@ export default function Home() {
     diffEditor.onDidDispose(() => {
       disposeOriginal.dispose();
       disposeModified.dispose();
+      disposeMarkers.dispose();
     });
     setEditorsLoaded((prev) => prev + 1);
   }, []);
 
-  const handleSecondEditorMount = useCallback((diffEditor: editor.IStandaloneDiffEditor) => {
+  const handleSecondEditorMount = useCallback((diffEditor: editor.IStandaloneDiffEditor, monaco: Monaco) => {
     secondDiffRef.current = diffEditor;
     diffEditor.getOriginalEditor().updateOptions({
       placeholder: "翻訳先ファイルを貼り付けてください",
@@ -95,12 +125,30 @@ export default function Home() {
       readOnly: true,
     });
 
+    const originalModel = diffEditor.getOriginalEditor().getModel();
+
+    const updateMarkers = () => {
+      if (originalModel) {
+        const markers = monaco.editor.getModelMarkers({ resource: originalModel.uri });
+        const errors = markers
+          .filter((m) => m.severity === monaco.MarkerSeverity.Error)
+          .map((m) => `[翻訳先] Line ${m.startLineNumber}: ${m.message}`)
+          .join('\n');
+        setMarkerErrors((prev) => (prev.target === (errors || null) ? prev : { ...prev, target: errors || null }));
+      }
+    };
+
+    const disposeMarkers = monaco.editor.onDidChangeMarkers(() => {
+      updateMarkers();
+    });
+
     const disposeOriginal = diffEditor.getOriginalEditor().onDidChangeModelContent(() => {
       setTarget(diffEditor.getOriginalEditor().getValue());
     });
 
     diffEditor.onDidDispose(() => {
       disposeOriginal.dispose();
+      disposeMarkers.dispose();
     });
     setEditorsLoaded((prev) => prev + 1);
   }, []);
@@ -108,14 +156,19 @@ export default function Home() {
   const patched = useMemo(() => {
     if (!source || !target) return target;
 
+    if (language === "json") {
+      const errors = [markerErrors.oldSource, markerErrors.source, markerErrors.target].filter(Boolean).join("\n\n");
+      if (errors) return errors;
+    }
+
     try {
       return language === "json"
         ? patchJson({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"})
         : patchLang({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"});
-    } catch (_err) {
-      return target;
+    } catch (err: any) {
+      return `エラーが発生しました:\n${err.message ?? err}`;
     }
-  }, [language, oldSource, source, target]);
+  }, [language, oldSource, source, target, markerErrors]);
 
   useEffect(() => {
     const modifiedEditor = secondDiffRef.current?.getModifiedEditor();
