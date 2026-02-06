@@ -1,4 +1,4 @@
-import {patchJson, PatchJsonParams} from "@/utils/jsonPatch";
+import {diffJson, patchJson, PatchJsonParams} from "@/utils/jsonPatch";
 
 const duplicatedKeyStrategies: PatchJsonParams["duplicatedKey"][] = ["ignore", "first", "last", "pop"];
 
@@ -240,5 +240,41 @@ describe("patchJson", () => {
     test.each(duplicatedKeyStrategies)("(duplicatedKey=%s)", strategy =>
       expect(patchJson({source, target, duplicatedKey: strategy})).toBe(expected[strategy]),
     );
+  });
+});
+
+describe("diffJson", () => {
+  test("returns changed entries with pop strategy", () => {
+    const oldSource = `{
+    "foo": "Foo",
+    "bazz": "Bass",
+    "fuga": "fuga1",
+    "fuga": "fuga2",
+    "fuga": "fuga3",
+    "hoge": "Hoge1",
+    "hoge": "Hoge2",
+    "hoge": "Hoge3"
+}`;
+    const source = `{
+    "foo": "Foo",
+    "bar": "Bar",
+    "bazz": "Bazz",
+    "fuga": "Fuga1",
+    "fuga": "Fuga2",
+    "fuga": "Fuga3",
+    "hoge": "Hoge1",
+    "hoge": "Hoge2",
+    "hoge": "Hoge3"
+}`;
+
+    const expected = `{
+    "bar": "Bar",
+    "bazz": "Bazz",
+    "fuga": "Fuga1",
+    "fuga": "Fuga2",
+    "fuga": "Fuga3"
+}`;
+
+    expect(diffJson({oldSource, source, duplicatedKey: "pop"})).toBe(expected);
   });
 });

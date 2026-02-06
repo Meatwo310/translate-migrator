@@ -3,8 +3,8 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {editor, languages} from "monaco-editor";
 import {useStatusManager} from "@/hooks/useStatusManager";
-import {patchJson} from "@/utils/jsonPatch";
-import {patchLang} from "@/utils/langPatch";
+import {diffJson, patchJson} from "@/utils/jsonPatch";
+import {diffLang, patchLang} from "@/utils/langPatch";
 import type {Monaco} from "@monaco-editor/react";
 import {DiffEditor} from "@monaco-editor/react";
 import ILanguageExtensionPoint = languages.ILanguageExtensionPoint;
@@ -59,7 +59,7 @@ export default function Home() {
   const [target, setTarget] = useState("");
   const secondDiffRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const languageId = useMemo(() => (language === "lang" ? minecraftLangId : "json"), [language]);
-  const {activeMessages} = useStatusManager(editorsLoaded < 2);
+  const {activeMessages, pushStatusMessage, removeStatusMessage} = useStatusManager(editorsLoaded < 2);
   const [markerErrors, setMarkerErrors] = useState<MarkerErrors>({ oldSource: null, source: null, target: null });
 
   const handleBeforeMount = useCallback((monaco: Monaco) => {
@@ -179,6 +179,25 @@ export default function Home() {
     modifiedEditor.setValue(patched);
   }, [patched]);
 
+  const canCopyDiff = useMemo(() => source.trim().length > 0, [source]);
+
+  const handleCopyDiff = useCallback(async () => {
+    const pendingId = pushStatusMessage("差分をコピー中...", true);
+    try {
+      const diff = language === "json"
+        ? diffJson({oldSource: oldSource || undefined, source, duplicatedKey: "pop"})
+        : diffLang({oldSource: oldSource || undefined, source, duplicatedKey: "pop"});
+      await navigator.clipboard.writeText(diff);
+      removeStatusMessage(pendingId);
+      const doneId = pushStatusMessage("差分をコピーしました");
+      setTimeout(() => removeStatusMessage(doneId), 2500);
+    } catch (err) {
+      removeStatusMessage(pendingId);
+      const errorId = pushStatusMessage("差分のコピーに失敗しました");
+      setTimeout(() => removeStatusMessage(errorId), 3000);
+    }
+  }, [language, oldSource, source, pushStatusMessage, removeStatusMessage]);
+
   return (
     <main className="flex min-h-screen bg-background text-foreground font-sans antialiased">
       <div className="flex w-full flex-1 flex-col gap-3 px-3 py-2 md:px-4 md:py-4 box-border">
@@ -195,6 +214,15 @@ export default function Home() {
             <option value="json">.json</option>
             <option value="lang">.lang</option>
           </select>
+
+          <button
+            type="button"
+            onClick={handleCopyDiff}
+            disabled={!canCopyDiff}
+            className="h-8 rounded-md border border-neutral-200 bg-white px-2.5 text-sm font-medium text-neutral-800 shadow-sm transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            新旧差分をコピー
+          </button>
 
           <span id="status" className="inline-flex items-center gap-1.5 min-h-[1.25rem] text-sm text-neutral-700 leading-none">
             {activeMessages.map((msg) => (

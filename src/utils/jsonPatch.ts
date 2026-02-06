@@ -56,6 +56,17 @@ export type PatchJsonParams = {
   duplicatedKey: "ignore" | "first" | "last" | "pop";
 };
 
+export type DiffJsonParams = {
+  /** 古い翻訳元JSONオブジェクト。 */
+  oldSource?: string;
+
+  /** 新しい翻訳元JSONオブジェクト。 */
+  source: string;
+
+  /** 重複キーの処理方法。 */
+  duplicatedKey: PatchJsonParams["duplicatedKey"];
+};
+
 const STRATEGIES: Record<PatchJsonParams["duplicatedKey"], SafeGetStrategy> = {
   // targetを見ずにsourceの値をそのまま返す
   ignore: (map, key, fallbackValue) => {
@@ -122,4 +133,44 @@ export const patchJson = (
       return `${indent}"${key}"${colon}"${get(key, value)}"${comma}`;
     })
     .join("\n");
+};
+
+export const diffJson = (
+  {oldSource, source, duplicatedKey}: DiffJsonParams,
+) => {
+  const oldSourceMap = parseToPropertyMap(oldSource);
+  const getStrategy = STRATEGIES[duplicatedKey];
+  const missing = `__MISSING__${Math.random().toString(36).slice(2)}__`;
+
+  const getOld = (key: string) => {
+    const values = oldSourceMap.get(key);
+    if (values == null || values.length === 0) return undefined;
+    const value = getStrategy(oldSourceMap, key, missing);
+    return value === missing ? undefined : value;
+  };
+
+  const entries = source
+    .split(/\r?\n/)
+    .map(line => {
+      const matches = line.match(/^([ \t]*)"([^"]*)"( *: *)"(.*)"(,? *)$/);
+      if (!matches) return null;
+      const [, indent, key, colon, value] = matches;
+      const oldValue = getOld(key);
+      if (oldValue === undefined || oldValue !== value) {
+        return {indent, key, colon, value};
+      }
+      return null;
+    })
+    .filter((entry): entry is {indent: string; key: string; colon: string; value: string} => entry != null);
+
+  if (entries.length === 0) {
+    return "{\n}";
+  }
+
+  const lines = entries.map((entry, index) => {
+    const comma = index === entries.length - 1 ? "" : ",";
+    return `${entry.indent}"${entry.key}"${entry.colon}"${entry.value}"${comma}`;
+  });
+
+  return ["{", ...lines, "}"].join("\n");
 };

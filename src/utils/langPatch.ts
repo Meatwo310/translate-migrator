@@ -56,6 +56,17 @@ export type PatchLangParams = {
 	duplicatedKey: "ignore" | "first" | "last" | "pop";
 };
 
+export type DiffLangParams = {
+  /** 古い翻訳元langファイル。 */
+  oldSource?: string;
+
+  /** 新しい翻訳元langファイル。 */
+  source: string;
+
+  /** 重複キーの処理方法。 */
+  duplicatedKey: PatchLangParams["duplicatedKey"];
+};
+
 const STRATEGIES: Record<PatchLangParams["duplicatedKey"], SafeGetStrategy> = {
   ignore: (map, key, fallbackValue) => {
     const property = map.get(key);
@@ -125,4 +136,47 @@ export const patchLang = (
       return `${indent}${key}${separator}${get(key, value)}`;
     })
     .join("\n");
+};
+
+export const diffLang = (
+  {oldSource, source, duplicatedKey}: DiffLangParams,
+) => {
+  const oldSourceMap = parseToPropertyMap(oldSource);
+  const getStrategy = STRATEGIES[duplicatedKey];
+  const missing = `__MISSING__${Math.random().toString(36).slice(2)}__`;
+
+  const getOld = (key: string) => {
+    const values = oldSourceMap.get(key);
+    if (values == null || values.length === 0) return undefined;
+    const value = getStrategy(oldSourceMap, key, missing);
+    return value === missing ? undefined : value;
+  };
+
+  const lines = source
+    .split(/\r?\n/)
+    .map(line => {
+      const commentMatch = line.match(/^([ \t]*)#(.*)$/);
+      if (commentMatch) {
+        const [, indent, comment] = commentMatch;
+        const oldValue = getOld(COMMENT_KEY);
+        if (oldValue === undefined || oldValue !== comment) {
+          return `${indent}#${comment}`;
+        }
+        return null;
+      }
+
+      const matches = line.match(/^([ \t]*)([^#=\s][^=]*?)([ \t]*=[ \t]*)(.*)$/);
+      if (!matches) return null;
+
+      const [, indent, key, separator, value] = matches;
+      const oldValue = getOld(key);
+      if (oldValue === undefined || oldValue !== value) {
+        return `${indent}${key}${separator}${value}`;
+      }
+
+      return null;
+    })
+    .filter((line): line is string => line != null);
+
+  return lines.join("\n");
 };
