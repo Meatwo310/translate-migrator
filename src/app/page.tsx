@@ -1,14 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { editor, languages } from "monaco-editor";
-import { useStatusManager } from "@/hooks/useStatusManager";
-import { diffJson, patchJson } from "@/utils/jsonPatch";
-import { diffLang, patchLang } from "@/utils/langPatch";
-import type { Monaco } from "@monaco-editor/react";
-import { DiffEditor } from "@monaco-editor/react";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { useTheme } from "@/context/ThemeContext";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {editor, languages} from "monaco-editor";
+import {useStatusManager} from "@/hooks/useStatusManager";
+import {diffJson, patchJson} from "@/utils/jsonPatch";
+import {diffLang, patchLang} from "@/utils/langPatch";
+import type {Monaco} from "@monaco-editor/react";
+import {DiffEditor} from "@monaco-editor/react";
 import ILanguageExtensionPoint = languages.ILanguageExtensionPoint;
 
 const commonOptions: editor.IDiffEditorConstructionOptions = {
@@ -61,10 +59,8 @@ export default function Home() {
   const [target, setTarget] = useState("");
   const secondDiffRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const languageId = useMemo(() => (language === "lang" ? minecraftLangId : "json"), [language]);
-  const { activeMessages, pushStatusMessage, removeStatusMessage } = useStatusManager(editorsLoaded < 2);
+  const {activeMessages, pushStatusMessage, removeStatusMessage} = useStatusManager(editorsLoaded < 2);
   const [markerErrors, setMarkerErrors] = useState<MarkerErrors>({ oldSource: null, source: null, target: null });
-  const { resolvedTheme } = useTheme();
-  const monacoTheme = resolvedTheme === "dark" ? "vs-dark" : "light";
 
   const handleBeforeMount = useCallback((monaco: Monaco) => {
     registerMinecraftLang(monaco);
@@ -167,8 +163,8 @@ export default function Home() {
 
     try {
       return language === "json"
-        ? patchJson({ oldSource: oldSource || undefined, source, target, duplicatedKey: "pop" })
-        : patchLang({ oldSource: oldSource || undefined, source, target, duplicatedKey: "pop" });
+        ? patchJson({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"})
+        : patchLang({oldSource: oldSource || undefined, source, target, duplicatedKey: "pop"});
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       return `エラーが発生しました:\n${message}`;
@@ -189,8 +185,8 @@ export default function Home() {
     const pendingId = pushStatusMessage("差分をコピー中...", true);
     try {
       const diff = language === "json"
-        ? diffJson({ oldSource: oldSource || undefined, source, duplicatedKey: "pop" })
-        : diffLang({ oldSource: oldSource || undefined, source, duplicatedKey: "pop" });
+        ? diffJson({oldSource: oldSource || undefined, source, duplicatedKey: "pop"})
+        : diffLang({oldSource: oldSource || undefined, source, duplicatedKey: "pop"});
       await navigator.clipboard.writeText(diff);
       removeStatusMessage(pendingId);
       const doneId = pushStatusMessage("差分をコピーしました");
@@ -205,15 +201,15 @@ export default function Home() {
   return (
     <main className="flex min-h-screen bg-background text-foreground font-sans antialiased">
       <div className="flex w-full flex-1 flex-col gap-3 px-3 py-2 md:px-4 md:py-4 box-border">
-        <div className="flex flex-wrap items-center gap-2 rounded-md border border-border bg-surface/80 backdrop-blur-sm px-2.5 py-1 shadow-sm">
-          <label htmlFor="language" className="text-sm font-medium text-text-primary leading-none">
+        <div className="flex flex-wrap items-center gap-2 rounded-md border border-neutral-200 bg-white/80 px-2.5 py-1 shadow-sm">
+          <label htmlFor="language" className="text-sm font-medium text-neutral-800 leading-none">
             ファイル形式:
           </label>
           <select
             id="language"
             value={language}
             onChange={(e) => setLanguage(e.target.value as "lang" | "json")}
-            className="h-8 rounded-md border border-border bg-surface px-2 text-sm text-text-primary shadow-sm transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40"
+            className="h-8 rounded-md border border-neutral-200 bg-white px-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
           >
             <option value="json">.json</option>
             <option value="lang">.lang</option>
@@ -223,12 +219,12 @@ export default function Home() {
             type="button"
             onClick={handleCopyDiff}
             disabled={!canCopyDiff}
-            className="h-8 rounded-md border border-border bg-surface px-2.5 text-sm font-medium text-text-primary shadow-sm transition hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-8 rounded-md border border-neutral-200 bg-white px-2.5 text-sm font-medium text-neutral-800 shadow-sm transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             新旧差分をコピー
           </button>
 
-          <span id="status" className="inline-flex flex-1 items-center gap-1.5 min-h-[1.25rem] text-sm text-text-secondary leading-none">
+          <span id="status" className="inline-flex items-center gap-1.5 min-h-[1.25rem] text-sm text-neutral-700 leading-none">
             {activeMessages.map((msg) => (
               <span
                 key={msg.uuid}
@@ -238,29 +234,25 @@ export default function Home() {
               </span>
             ))}
           </span>
-
-          <ThemeToggle />
         </div>
 
         <div className="grid min-h-[60vh] flex-1 grid-rows-2 gap-3 md:gap-4">
-          <div className="min-h-0 overflow-hidden rounded-lg border border-border bg-surface-secondary shadow-sm">
+          <div className="min-h-0 overflow-hidden rounded-lg border border-neutral-200 bg-slate-50 shadow-sm">
             <DiffEditor
               height="100%"
               options={commonOptions}
               onMount={handleFirstEditorMount}
               beforeMount={handleBeforeMount}
               language={languageId}
-              theme={monacoTheme}
             />
           </div>
-          <div className="min-h-0 overflow-hidden rounded-lg border border-border bg-surface-secondary shadow-sm">
+          <div className="min-h-0 overflow-hidden rounded-lg border border-neutral-200 bg-slate-50 shadow-sm">
             <DiffEditor
               height="100%"
               options={commonOptions}
               onMount={handleSecondEditorMount}
               beforeMount={handleBeforeMount}
               language={languageId}
-              theme={monacoTheme}
             />
           </div>
         </div>
